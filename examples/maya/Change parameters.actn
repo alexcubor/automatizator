@@ -1,0 +1,94 @@
+{
+    "info": {
+        "version": 1.0
+    },
+    "action": {
+        "main_actions": [
+            {
+                "enable": true,
+                "name": "Import geometry",
+                "soft": "",
+                "run": "allways",
+                "override": {},
+                "type": "script",
+                "enable_build": true,
+                "build_script": "import maya.cmds as cmds\nimport maya.mel as mm\n\nif not cmds.ls('pCube1'):\n\tmm.eval('CreatePolygonCube;')\n\tmm.eval('polyCube -w 1 -h 1 -d 1 -sx 1 -sy 1 -sz 1 -ax 0 1 0 -cuv 4 -ch 1;')\n\nreturn True",
+                "enable_check": true,
+                "check_script": "if not cmds.ls('pCube1'):\n\treturn False, \"Geometry not imported!\"\nelse:\n\treturn True"
+            },
+            {
+                "enable": true,
+                "name": "Import shaders",
+                "soft": "maya",
+                "run": "allways",
+                "override": {},
+                "type": "script",
+                "enable_build": true,
+                "build_script": "import maya.mel as mm\nif not cmds.ls('aiStandardSurface1'):\n\tcmds.shadingNode('aiStandardSurface', asShader=True)\n\tshading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True)\n\tcmds.connectAttr(shader + '.outColor', shading_group + '.surfaceShader')\n\tcmds.sets('pCube1', e=True, forceElement=shading_group)\nmm.eval('setAttr aiStandardSurface1.baseColor -type double3 1 0 0')\nreturn True",
+                "enable_check": true,
+                "check_script": "if not cmds.ls('aiStandardSurface1'):\n\treturn False, 'Not find shader!'\nelse:\n\treturn True"
+            },
+            {
+                "enable": true,
+                "name": "Render Settings",
+                "soft": "maya",
+                "run": "allways",
+                "override": {},
+                "type": "attr",
+                "enable_build": true,
+                "attr": [
+                    {
+                        "type": "",
+                        "name": "defaultArnoldRenderOptions.AASamples",
+                        "value": "6"
+                    },
+                    {
+                        "type": "",
+                        "name": "defaultArnoldRenderOptions.GIDiffuseSamples",
+                        "value": "3"
+                    },
+                    {
+                        "type": "",
+                        "name": "defaultArnoldRenderOptions.GISpecularSamples",
+                        "value": "3"
+                    }
+                ],
+                "enable_check": true,
+                "check_script": ""
+            },
+            {
+                "enable": true,
+                "name": "Import FX",
+                "soft": "maya",
+                "run": "allways",
+                "override": {},
+                "type": "script",
+                "enable_build": true,
+                "build_script": "import maya.mel as mm\nif not cmds.ls('fluid1'):\n\tmm.eval('Create3DContainerEmitter')\nreturn True",
+                "enable_check": true,
+                "check_script": "if not cmds.ls('fluid1'):\n\treturn 'warning', 'Not find FX!'\nelse:\n\treturn True"
+            },
+            {
+                "enable": true,
+                "name": "Import Lights",
+                "soft": "maya",
+                "run": "allways",
+                "override": {},
+                "type": "script",
+                "enable_build": true,
+                "build_script": "if not cmds.ls('aiSkyDomeLight1'):\n\tcmds.createNode('aiSkyDomeLight')\nreturn True",
+                "enable_check": true,
+                "check_script": "if not cmds.ls('aiSkyDomeLight1'):\n\treturn Fslse, 'Lights is not imported!'\nelse:\n\treturn True"
+            }
+        ]
+    },
+    "button": {
+        "main_buttons": []
+    },
+    "output": {
+        "output_actions": {
+            "actions": "main_actions",
+            "buttons": "main_buttons"
+        }
+    }
+}
