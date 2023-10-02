@@ -72,14 +72,6 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addLayout(self.layout_tabs)
 
-        self.buttons_info = QLabel(self.widget_main)
-        self.buttons_info.setObjectName(u"buttons_info")
-        self.buttons_info.setTextFormat(Qt.AutoText)
-        self.buttons_info.setScaledContents(False)
-        self.buttons_info.setWordWrap(True)
-
-        self.verticalLayout.addWidget(self.buttons_info)
-
         self.layout_buttons = QVBoxLayout()
         self.layout_buttons.setObjectName(u"layout_buttons")
 
@@ -105,6 +97,5 @@ class Ui_Dialog(object):
         self.menu_settings.setText(QCoreApplication.translate("Dialog", u"Settings", None))
         self.menu_help.setText(QCoreApplication.translate("Dialog", u"Help", None))
         self.button_add_action0.setText(QCoreApplication.translate("Dialog", u"+", None))
-        self.buttons_info.setText(QCoreApplication.translate("Dialog", u"\u041a\u043d\u043e\u043f\u043a\u0438 \u043f\u043e\u044f\u0432\u043b\u044f\u044e\u0442\u0441\u044f \u0442\u043e\u043b\u044c\u043a\u043e \u0432 \u0440\u0435\u0436\u0438\u043c\u0435 \u0447\u0435\u043a\u0435\u0440\u0430 \u0438 \u0441\u0442\u0430\u043d\u043e\u0432\u044f\u0442\u0441\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u043c\u0438 \u0442\u043e\u043b\u044c\u043a\u043e \u043f\u043e\u0441\u043b\u0435 \u0435\u0433\u043e \u043f\u0440\u043e\u0445\u043e\u0436\u0434\u0435\u043d\u0438\u044f.", None))
     # retranslateUi
 

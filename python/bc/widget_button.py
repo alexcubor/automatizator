@@ -23,10 +23,19 @@ class WidgetButton(QtWidgets.QWidget):
         self.app_path = config.app_path()
         self.soft = config.soft_name()
 
+        # Toolbar
+        icon = QtGui.QIcon(f"{self.app_path}/icons/resize.png")
+        self.ui.button_open_script.setIcon(icon)
+        self.ui.button_open_script.setStyleSheet(
+            "QPushButton:hover { background-color: %s; }" % config.color_blue())
+        self.ui.button_open_script.clicked.connect(
+            lambda: code_editor.run(parent=self, plain=self.ui.button_script))
+        # Script
         self.ui.button_script.setPlaceholderText(self.dict["button_placeholder"])
         self.ui.button_script.setFont(QtGui.QFont("Courier New"))
         self.ui.button_script.setTabStopWidth(20)
         self.ui.button_script.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
+        self.ui.buttons_info.setText(self.dict["buttons_info"])
 
     # TODO: Почему то не работает
     def keyPressEvent(self, event):

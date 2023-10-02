@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>608</width>
-    <height>148</height>
+    <width>837</width>
+    <height>190</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,30 +17,33 @@
    <item>
     <layout class="QHBoxLayout" name="layout_button_bar">
      <item>
-      <widget class="QPushButton" name="button_add">
-       <property name="maximumSize">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
          <height>20</height>
         </size>
        </property>
-       <property name="text">
-        <string>+</string>
-       </property>
-      </widget>
+      </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="button_close">
-       <property name="maximumSize">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
         <size>
-         <width>20</width>
+         <width>40</width>
          <height>20</height>
         </size>
        </property>
-       <property name="text">
-        <string>×</string>
-       </property>
-      </widget>
+      </spacer>
      </item>
      <item>
       <widget class="QLineEdit" name="button_name">
@@ -48,7 +51,7 @@
         <enum>Qt::LeftToRight</enum>
        </property>
        <property name="text">
-        <string>Имя кнопки</string>
+        <string>Button name</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -68,14 +71,53 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="button_open_script">
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
     <layout class="QVBoxLayout" name="layout_button_script">
      <item>
       <widget class="QPlainTextEdit" name="button_script">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>80</height>
+        </size>
+       </property>
        <property name="placeholderText">
         <string>Напишите python скрипт, что бы кнопка появилась в чекере...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="buttons_info">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>Пояснение: кнопка появляется только в режиме чекера. 
+Она запускается автоматически, если все этапы прошли успешно.</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

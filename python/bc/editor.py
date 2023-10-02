@@ -9,9 +9,11 @@ import json
 
 from .ui import dialog
 from . import widget_action
+from . import widget_button
 from . import dialog_save_shelf
 from importlib import reload
 
+reload(widget_button)
 reload(widget_action)
 reload(dialog)
 reload(dialog_save_shelf)
@@ -107,8 +109,9 @@ class Editor(QtWidgets.QDialog):
         self.opened_file = config.get_recent()[0]
         self.load_actions(file_actions=self.opened_file, force=True)
         self.update_indexes()
-        # Checker buttons
-        self.ui.buttons_info.setText(self.dict["buttons_info"])
+        # Add button
+        widget_btn = widget_button.WidgetButton(parent=self, dictionary=self.dict)
+        self.ui.layout_buttons.addWidget(widget_btn)
 
     def widget_action(self):
         widget = widget_action.WidgetAction(parent=self, dictionary=self.dict)

@@ -104,22 +104,6 @@
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="buttons_info">
-         <property name="text">
-          <string>Кнопки появляются только в режиме чекера и становятся доступными только после его прохождения.</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::AutoText</enum>
-         </property>
-         <property name="scaledContents">
-          <bool>false</bool>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
         <layout class="QVBoxLayout" name="layout_buttons"/>
        </item>
        <item>
