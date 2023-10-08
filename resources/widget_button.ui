@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>837</width>
-    <height>190</height>
+    <width>586</width>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,6 +47,12 @@
      </item>
      <item>
       <widget class="QLineEdit" name="button_name">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>25</height>
+        </size>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>

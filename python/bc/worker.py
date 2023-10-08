@@ -25,14 +25,22 @@ class Worker(QtWidgets.QDialog):
         self.app_path = config.app_path()
         self.file = None
         self.mode = None
-        self.result = None
+        self.result = True
         self.ui = worker.Ui_Dialog()
         self.ui.setupUi(self)
         self.last_widget = None
 
     def start(self):
         with open(self.file, "r") as file:
-            actions = json.load(file)
+            data = json.load(file)
+        actions = data["action"]["main_actions"]
+        if self.mode == "check":
+            buttons = data["button"]["main_buttons"]
+            # Post button
+            for button_data in buttons:
+                button = QtWidgets.QPushButton(button_data["name"])
+                button.clicked.connect(lambda: exec(button_data["script"]))
+                self.ui.post_buttons.addWidget(button)
         # Create an instance of the ProgressThread
         thread = ProgressThread(self)
         thread.mode = self.mode
@@ -66,6 +74,7 @@ class Worker(QtWidgets.QDialog):
             self.last_widget.ui.status.setPixmap(status_done)
         elif result == "False":
             status_error = QtGui.QPixmap(f"{self.app_path}/icons/status_error.png")
+            self.result = False
             self.last_widget.ui.status.setPixmap(status_error)
             if message:
                 self.last_widget.ui.info.setVisible(True)
@@ -79,6 +88,8 @@ class Worker(QtWidgets.QDialog):
                 self.last_widget.ui.info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         else:
             status_warning = QtGui.QPixmap(f"{self.app_path}/icons/status_warning.png")
+            if self.result != False:
+                self.result = "warning"
             self.last_widget.ui.status.setPixmap(status_warning)
             if message:
                 self.last_widget.ui.info.setVisible(True)
@@ -100,9 +111,6 @@ class Worker(QtWidgets.QDialog):
             self.last_widget.ui.fix_button.clicked.connect(lambda: exec(script))
 
     def finish(self):
-        if self.mode == "check":
-            start_button = QtWidgets.QPushButton("Send to farm")
-            self.ui.verticalLayout.addWidget(start_button)
         label_done = QtWidgets.QLabel(self.dict["build_done"])
         label_done.setAlignment(QtCore.Qt.AlignCenter)
         self.ui.verticalLayout.addWidget(label_done)
@@ -197,6 +205,12 @@ class ProgressThread(QtCore.QThread):
                                 result, message = False, e
             self.progress_updated.emit(int(100 / len(self.actions) * (i + 1)), str(result), message)
         self.progress_done.emit("")
+        if self.result == True:
+            for index in range(self.ui.post_buttons.count()):
+                post_button = self.ui.post_buttons.itemAt(index).widget()
+                result, message = post_button.click()
+                label_message = QtWidgets.QLabel(message)
+                self.ui.post_buttons.addWidget(label_message)
 
     def close(self):
         self.finished.emit()

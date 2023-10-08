@@ -26,7 +26,7 @@ class Ui_Dialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_widget = QWidget()
         self.scroll_widget.setObjectName(u"scroll_widget")
-        self.scroll_widget.setGeometry(QRect(0, 0, 374, 550))
+        self.scroll_widget.setGeometry(QRect(0, 0, 374, 538))
         self.scroll_widget.setMaximumSize(QSize(374, 16777215))
         self.verticalLayout_3 = QVBoxLayout(self.scroll_widget)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -48,6 +48,11 @@ class Ui_Dialog(object):
         self.progress_bar.setValue(24)
 
         self.verticalLayout.addWidget(self.progress_bar)
+
+        self.post_buttons = QVBoxLayout()
+        self.post_buttons.setObjectName(u"post_buttons")
+
+        self.verticalLayout.addLayout(self.post_buttons)
 
 
         self.retranslateUi(Dialog)

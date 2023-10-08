@@ -83,11 +83,9 @@
 "button": {
     "main_buttons": [
             {
-                "label":  "Send to Afanasy",
-                "command":  "import maya.cmds as cmds; cmds.delete(cmds.ls(type='unknown')); import afanasy; ui = afanasy.UI(); ui.show()"},
-            {
-                "label": "Send to Deadline",
-                "command": "import maya.mel as mm; mm.eval('SubmitJobToDeadline')"
+                "soft": "",
+                "name": "Send to Afanasy",
+                "script": "import afanasy\nimport maya.cmds as cmds\ncmds.delete(cmds.ls(type='unknown'))\nui = afanasy.UI()\nui.show()"
             }
         ]
 },

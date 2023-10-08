@@ -17,7 +17,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(837, 190)
+        Form.resize(586, 209)
         self.verticalLayout_2 = QVBoxLayout(Form)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.layout_button_bar = QHBoxLayout()
@@ -32,6 +32,7 @@ class Ui_Form(object):
 
         self.button_name = QLineEdit(Form)
         self.button_name.setObjectName(u"button_name")
+        self.button_name.setMinimumSize(QSize(0, 25))
         self.button_name.setLayoutDirection(Qt.LeftToRight)
         self.button_name.setAlignment(Qt.AlignCenter)
 

@@ -23,6 +23,10 @@ class WidgetButton(QtWidgets.QWidget):
         self.app_path = config.app_path()
         self.soft = config.soft_name()
 
+        palette = self.style().standardPalette()
+        self.default_button_color = palette.color(QtGui.QPalette.Button)
+        self.ui.button_name.setStyleSheet(f"background-color: {config.color_green()};")
+
         # Toolbar
         icon = QtGui.QIcon(f"{self.app_path}/icons/resize.png")
         self.ui.button_open_script.setIcon(icon)
@@ -47,12 +51,12 @@ class WidgetButton(QtWidgets.QWidget):
             super().keyPressEvent(event)
 
     def get_button(self):
-        data = {"name": self.ui.button_name.toPlainText(),
+        data = {"name": self.ui.button_name.text(),
                 "script": self.ui.button_script.toPlainText(),
                 }
         return data
 
-    def set_action(self, data):
+    def set_button(self, data):
         self.soft = data["soft"]
         self.ui.button_name.setText(data["name"])
-        self.ui.button_script.setPlainText(data["name"])
+        self.ui.button_script.setPlainText(data["script"])

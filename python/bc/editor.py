@@ -105,18 +105,22 @@ class Editor(QtWidgets.QDialog):
         # Add new action
         self.ui.button_add_action0.clicked.connect(lambda: self.insert_widget_action(1))
         self.ui.button_add_action0.setStyleSheet("QPushButton:hover { background-color: %s; }" % config.color_green())
+        # Add button
+        self.widget_button = self.widget_button()
+        self.ui.layout_buttons.addWidget(self.widget_button)
         # List actions
         self.opened_file = config.get_recent()[0]
         self.load_actions(file_actions=self.opened_file, force=True)
         self.update_indexes()
-        # Add button
-        widget_btn = widget_button.WidgetButton(parent=self, dictionary=self.dict)
-        self.ui.layout_buttons.addWidget(widget_btn)
 
     def widget_action(self):
         widget = widget_action.WidgetAction(parent=self, dictionary=self.dict)
         widget.ui.button_add_action.clicked.connect(lambda: self.insert_widget_action(widget.index + 1))
         widget.ui.button_close.clicked.connect(lambda: self.delete_widget(widget))
+        return widget
+
+    def widget_button(self):
+        widget = widget_button.WidgetButton(parent=self, dictionary=self.dict)
         return widget
 
     def delete_widget(self, widget):
@@ -136,7 +140,7 @@ class Editor(QtWidgets.QDialog):
         if file_name:
             self.load_actions(file_actions=file_name)
 
-    def shelf_workers(self):
+    def shelf_workers(self, path=True):
         buttons = []
         if config.soft_name() == "maya":
             import maya.cmds as cmds
@@ -144,9 +148,14 @@ class Editor(QtWidgets.QDialog):
                 script = cmds.shelfButton(button, q=True, command=True)
                 match = re.search(r'worker\.run\(file="(.+)",', script)
                 if match:
-                    path = match.group(1)
-                    if path not in buttons:
-                        buttons.append(path)
+                    filepath = match.group(1)
+                    if path:
+                        if filepath not in buttons:
+                            buttons.append(filepath)
+                    else:
+                        filename = os.path.splitext(os.path.basename(filepath))[0]
+                        if filename not in buttons:
+                            buttons.append(filename)
         return buttons
 
     def save_file(self, force=False):
@@ -170,15 +179,16 @@ class Editor(QtWidgets.QDialog):
         if not os.path.isdir(shelf_folder):
             os.makedirs(shelf_folder)
         file_actions = f"{shelf_folder}/{name}.actn"
-        actions = self.current_actions()["action"]["main_actions"]
+        data = self.current_actions()
+        actions = data["action"]["main_actions"]
         is_build = True if True in [a["enable_build"] for a in actions if "enable_build" in a] else False
         is_check = True if True in [a["enable_check"] for a in actions if "enable_check" in a] else False
         if not is_build and not is_check:
             is_build = True
             is_check = True
         self.opened_file = file_actions
-        self.save(actions)
-        if name not in self.shelf_workers():
+        self.save(data)
+        if name not in self.shelf_workers(path=False):
             if config.soft_name() == "maya":
                 import maya.cmds as cmds
                 if is_build:
@@ -249,14 +259,22 @@ class Editor(QtWidgets.QDialog):
             file_actions = _create_default_actions()
 
         with open(file_actions, "r") as file:  # Open local actions
-            actions = json.load(file)
+            try:
+                actions = json.load(file)
+            except Exception as err:
+                print(err)
+                actions = _create_default_actions()
         # Check by changes?
         if not force:
             result = self.check_changes()
             if result == False:
                 return
         print('update_ui', file_actions)
-        self.update_ui(actions, file_actions=file_actions)
+        try:
+            self.update_ui(actions, file_actions=file_actions)
+        except Exception as err:
+            print(err)
+            _create_default_actions()
 
     def update_ui(self, data, file_actions=None):
         # Clean actions before
@@ -268,9 +286,12 @@ class Editor(QtWidgets.QDialog):
             last_output = list(data["output"].keys())[-1]
             main_actions = data["output"][last_output]["actions"]
             actions = data["action"][main_actions]
+            main_buttons = data["output"][last_output]["buttons"]
+            button = data["button"][main_buttons][-1]
         except:
             # TODO: Убрать. Оставить только то, что в try
             actions = data
+            button = None
         for action in actions:
             height = 0
             if action["soft"] == config.soft_name() or not action["soft"]:
@@ -279,6 +300,8 @@ class Editor(QtWidgets.QDialog):
                 self.ui.layout_tabs.insertWidget(self.ui.layout_tabs.count(), widget)
                 height += widget.height()
             self.resize(self.width(), height)
+        if button["soft"] == config.soft_name() or not button["soft"]:
+            self.widget_button.set_button(button)
         if not self.app_path + "/examples/" in file_actions:
             self.opened_file = file_actions
         else:
@@ -305,9 +328,10 @@ class Editor(QtWidgets.QDialog):
         buttons = []
         count_buttons = self.ui.layout_buttons.count()
         for index in range(count_buttons):
-            item = self.ui.layout_tabs.itemAt(index).widget()
+            item = self.ui.layout_buttons.itemAt(index).widget()
             button = item.get_button()
-            buttons.append(button)
+            if button["script"]:
+                buttons.append(button)
         data = {"info": {"version": config.version()},
                 "action": {"main_actions": actions},
                 "button": {"main_buttons": buttons},

@@ -117,6 +117,8 @@ class WidgetAction(QtWidgets.QWidget):
         # Add new action
         self.ui.button_add_override_action.setText(self.dict["add_override"] + " +")
         self.ui.button_add_action.setStyleSheet("QPushButton:hover { background-color: #556B2F; }")
+        # TODO: Добавить логику оверайдов
+        self.ui.button_add_override_action.setVisible(False)
 
     def enable_builder(self, state):
         self.ui.action_script_build.setHidden(not bool(state))

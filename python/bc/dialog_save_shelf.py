@@ -43,7 +43,7 @@ class SaveShelf(QDialog):
         layout.setAlignment(self.button, Qt.AlignCenter)
 
     def check_exist(self, shelf_name):
-        if shelf_name in self.parent.shelf_workers():
+        if shelf_name in self.parent.shelf_workers(path=False):
             self.text_edit.setStyleSheet("color: %s;" % config.color_red())
             self.button.setText(self.dict["overwrite"])
         else:
