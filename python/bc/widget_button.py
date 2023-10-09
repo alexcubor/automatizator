@@ -51,7 +51,8 @@ class WidgetButton(QtWidgets.QWidget):
             super().keyPressEvent(event)
 
     def get_button(self):
-        data = {"name": self.ui.button_name.text(),
+        data = {"soft": config.soft_name(),
+                "name": self.ui.button_name.text(),
                 "script": self.ui.button_script.toPlainText(),
                 }
         return data

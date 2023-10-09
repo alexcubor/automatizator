@@ -51,6 +51,13 @@ class Worker(QtWidgets.QDialog):
         thread.change_fix_button.connect(self.add_fix_button)
         thread.progress_done.connect(self.finish)
         thread.start()
+        # Run button
+        if self.result == True:
+            for index in range(self.ui.post_buttons.count()):
+                post_button = self.ui.post_buttons.itemAt(index).widget()
+                result, message = post_button.click()
+                label_message = QtWidgets.QLabel(message)
+                self.ui.post_buttons.addWidget(label_message)
 
     def add_step(self, action_name):
         widget = worker_action.WorkerAction(parent=self, dictionary=self.dict)
@@ -205,12 +212,6 @@ class ProgressThread(QtCore.QThread):
                                 result, message = False, e
             self.progress_updated.emit(int(100 / len(self.actions) * (i + 1)), str(result), message)
         self.progress_done.emit("")
-        if self.result == True:
-            for index in range(self.ui.post_buttons.count()):
-                post_button = self.ui.post_buttons.itemAt(index).widget()
-                result, message = post_button.click()
-                label_message = QtWidgets.QLabel(message)
-                self.ui.post_buttons.addWidget(label_message)
 
     def close(self):
         self.finished.emit()

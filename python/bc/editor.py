@@ -269,7 +269,6 @@ class Editor(QtWidgets.QDialog):
             result = self.check_changes()
             if result == False:
                 return
-        print('update_ui', file_actions)
         try:
             self.update_ui(actions, file_actions=file_actions)
         except Exception as err:
