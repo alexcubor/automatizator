@@ -88,16 +88,22 @@ class Worker(QtWidgets.QDialog):
 
             widget.ui.fix_button.clicked.connect(_script)
 
-    def finish(self):
+    def finish(self, result):
         label_done = QtWidgets.QLabel(self.dict["build_done"])
         label_done.setAlignment(QtCore.Qt.AlignCenter)
         self.ui.verticalLayout.addWidget(label_done)
+        if result == True:
+            for index in range(self.ui.post_buttons.count()):
+                post_button = self.ui.post_buttons.itemAt(index).widget()
+                result, message = post_button.click()
+                label_message = QtWidgets.QLabel(message)
+                self.ui.post_buttons.addWidget(label_message)
 
 
 class ProgressThread(QtCore.QThread):
     progress_start = QtCore.Signal(str)
     progress_updated = QtCore.Signal(int, str, str)
-    progress_done = QtCore.Signal(str)
+    progress_done = QtCore.Signal(bool)
     change_fix_button = QtCore.Signal(bool, str, str, int)
 
     def __init__(self, parent, *args, **kwargs):
@@ -197,14 +203,8 @@ class ProgressThread(QtCore.QThread):
             if result == "warning" and self.result != False:
                 self.result = "warning"
             self.progress_updated.emit(int(100 / len(self.actions) * (i + 1)), str(result), message)
-        self.progress_done.emit("")
+        self.progress_done.emit(self.result)
 
-        if self.result == True:
-            for index in range(self.ui.post_buttons.count()):
-                post_button = self.ui.post_buttons.itemAt(index).widget()
-                result, message = post_button.click()
-                label_message = QtWidgets.QLabel(message)
-                self.ui.post_buttons.addWidget(label_message)
 
     def close(self):
         self.finished.emit()
