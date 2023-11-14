@@ -23,8 +23,8 @@ class WidgetButton(QtWidgets.QWidget):
         self.app_path = config.app_path()
         self.soft = config.soft_name()
 
-        palette = self.style().standardPalette()
-        self.default_button_color = palette.color(QtGui.QPalette.Button)
+        #palette = self.style().standardPalette()
+        #self.default_button_color = palette.color(QtGui.QPalette.Button)
         self.ui.button_name.setStyleSheet(f"background-color: {config.color_green()};")
 
         # Toolbar

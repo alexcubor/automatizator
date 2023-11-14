@@ -150,6 +150,9 @@
            <property name="cursor" stdset="0">
             <cursorShape>IBeamCursor</cursorShape>
            </property>
+           <property name="verticalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOff</enum>
+           </property>
            <property name="placeholderText">
             <string>Name the action</string>
            </property>
@@ -196,7 +199,7 @@
           <item>
            <layout class="QHBoxLayout" name="layout_rule" stretch="0,0,0,0">
             <property name="spacing">
-             <number>-1</number>
+             <number>6</number>
             </property>
             <property name="topMargin">
              <number>0</number>

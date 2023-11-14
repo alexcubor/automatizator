@@ -1,0 +1,7 @@
+
+For Maya:
+
+1. Put folder Automatizator to ../maya/plug-ins in folder Documents
+2. Add to Maya.env: MAYA_MODULE_PATH = ../Automatizator/plugins/maya (.. replace to absolute path)
+
+

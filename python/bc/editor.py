@@ -281,16 +281,11 @@ class Editor(QtWidgets.QDialog):
             widget = self.ui.layout_tabs.itemAt(0).widget()
             self.delete_widget(widget)
         # Add actions
-        try:
-            last_output = list(data["output"].keys())[-1]
-            main_actions = data["output"][last_output]["actions"]
-            actions = data["action"][main_actions]
-            main_buttons = data["output"][last_output]["buttons"]
-            button = data["button"][main_buttons][-1]
-        except:
-            # TODO: Убрать. Оставить только то, что в try
-            actions = data
-            button = None
+        last_output = list(data["output"].keys())[-1]
+        main_actions = data["output"][last_output]["actions"]
+        actions = data["action"][main_actions]
+        main_buttons = data["output"][last_output]["buttons"]
+        buttons = data["button"][main_buttons]
         for action in actions:
             height = 0
             if action["soft"] == config.soft_name() or not action["soft"]:
@@ -299,8 +294,10 @@ class Editor(QtWidgets.QDialog):
                 self.ui.layout_tabs.insertWidget(self.ui.layout_tabs.count(), widget)
                 height += widget.height()
             self.resize(self.width(), height)
-        if button["soft"] == config.soft_name() or not button["soft"]:
-            self.widget_button.set_button(button)
+        if buttons:
+            button = buttons[-1]
+            if button["soft"] == config.soft_name() or not button["soft"]:
+                self.widget_button.set_button(button)
         if not self.app_path + "/examples/" in file_actions:
             self.opened_file = file_actions
         else:

@@ -1,12 +1,9 @@
-import sys
-
 from PySide2 import QtWidgets
 from PySide2 import QtCore
 from PySide2 import QtGui
 import traceback
 from . import config
 from importlib import reload
-import inspect
 import json
 import time
 
@@ -25,7 +22,6 @@ class Worker(QtWidgets.QDialog):
         self.app_path = config.app_path()
         self.file = None
         self.mode = None
-        self.result = True
         self.ui = worker.Ui_Dialog()
         self.ui.setupUi(self)
         self.last_widget = None
@@ -51,13 +47,6 @@ class Worker(QtWidgets.QDialog):
         thread.change_fix_button.connect(self.add_fix_button)
         thread.progress_done.connect(self.finish)
         thread.start()
-        # Run button
-        if self.result == True:
-            for index in range(self.ui.post_buttons.count()):
-                post_button = self.ui.post_buttons.itemAt(index).widget()
-                result, message = post_button.click()
-                label_message = QtWidgets.QLabel(message)
-                self.ui.post_buttons.addWidget(label_message)
 
     def add_step(self, action_name):
         widget = worker_action.WorkerAction(parent=self, dictionary=self.dict)
@@ -76,46 +65,28 @@ class Worker(QtWidgets.QDialog):
         self.ui.scroll_layout.addWidget(sep_line)
 
     def update_status(self, progress_value, result, message):
-        if result == "True":
-            status_done = QtGui.QPixmap(f"{self.app_path}/icons/status_done.png")
-            self.last_widget.ui.status.setPixmap(status_done)
-        elif result == "False":
-            status_error = QtGui.QPixmap(f"{self.app_path}/icons/status_error.png")
-            self.result = False
-            self.last_widget.ui.status.setPixmap(status_error)
-            if message:
-                self.last_widget.ui.info.setVisible(True)
-                self.last_widget.ui.info.setPlainText(message)
-            font_metrics = QtGui.QFontMetrics(self.last_widget.ui.info.font())
-            text_size = font_metrics.size(QtCore.Qt.TextSingleLine, self.last_widget.ui.info.toPlainText())
-            if text_size.width() == 0:
-                self.last_widget.ui.info.setVisible(False)
-            if text_size.width() < 100:
-                self.last_widget.ui.info.setMaximumSize(1000, text_size.width())
-                self.last_widget.ui.info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        else:
-            status_warning = QtGui.QPixmap(f"{self.app_path}/icons/status_warning.png")
-            if self.result != False:
-                self.result = "warning"
-            self.last_widget.ui.status.setPixmap(status_warning)
-            if message:
-                self.last_widget.ui.info.setVisible(True)
-                self.last_widget.ui.info.setPlainText(message)
-                font_metrics = QtGui.QFontMetrics(self.last_widget.ui.info.font())
-                text_size = font_metrics.size(QtCore.Qt.TextSingleLine, self.last_widget.ui.info.toPlainText())
-                if text_size.width() == 0:
-                    self.last_widget.ui.info.setVisible(False)
-                if text_size.width() < 100:
-                    self.last_widget.ui.info.setMaximumSize(1000, text_size.width())
-                    self.last_widget.ui.info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.ui.progress_bar.setValue(progress_value)
+        return self.last_widget.update_status(progress_value, result, message)
 
-    def add_fix_button(self, visible, name, script):
+    def add_fix_button(self, visible, name, script, index):
+        widget = self.last_widget
         if self.mode == "check" and visible:
-            self.last_widget.ui.fix_button.setVisible(True)
+            widget.ui.fix_button.setVisible(True)
             if name:
-                self.last_widget.ui.fix_button.setText(name)
-            self.last_widget.ui.fix_button.clicked.connect(lambda: exec(script))
+                widget.ui.fix_button.setText(name)
+
+            def _script():
+                local_vars = {}
+                global_vars = {}
+                exec(script, global_vars, local_vars)
+                if type(local_vars.get("result")) == tuple:
+                    result, message = local_vars.get("result")
+                else:
+                    result, message = local_vars.get("result"), None
+                    if result == None:
+                        result = "True"
+                widget.update_status(100, result, message)
+
+            widget.ui.fix_button.clicked.connect(_script)
 
     def finish(self):
         label_done = QtWidgets.QLabel(self.dict["build_done"])
@@ -127,12 +98,13 @@ class ProgressThread(QtCore.QThread):
     progress_start = QtCore.Signal(str)
     progress_updated = QtCore.Signal(int, str, str)
     progress_done = QtCore.Signal(str)
-    change_fix_button = QtCore.Signal(bool, str, str)
+    change_fix_button = QtCore.Signal(bool, str, str, int)
 
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.mode = None
         self.actions = None
+        self.result = True
 
     def run(self):
         for action in self.actions:
@@ -148,33 +120,43 @@ class ProgressThread(QtCore.QThread):
             # Run script
             result, message = None, None
             if action["type"] == "script":
+                def run_script():
+                    out_script = action[f'{self.mode}_script']
+                    if out_script:
+                        out_script = "    " + out_script.replace('\n', '\n    ')
+                        run_script = f"def build_script():    \n{out_script}\nresult = build_script()"
+                        run_script = run_script.replace("q=True", "query=True")
+                        try:
+                            local_vars = {}
+                            global_vars = {}
+                            exec(run_script, global_vars, local_vars)
+                            if type(local_vars.get("result")) == tuple:
+                                result, message = local_vars.get("result")
+                            else:
+                                result, message = local_vars.get("result"), None
+                            if result == None:
+                                result = True
+                        except Exception as e:
+                            print("---------------")
+                            print(f"Exec [{i + 1} {action['name']}] Error", str(e))
+                            for num, line in enumerate(run_script.split("\n")):
+                                print(line)
+                            print("---Traceback---")
+                            print(traceback.format_exc())
+                            print("---------------")
+                            result, message = False, e
+                    return result, message
+
                 def fix_button(visible=True, name=None, script=None):
                     if not script:
                         out_build_script = "    " + action['build_script'].replace('\n', '\n    ')
                         script = f"def build_script():    \n{out_build_script}\nresult = build_script()"
-                    return self.change_fix_button.emit(visible, name, script)
+                    return self.change_fix_button.emit(visible, name, script, i)
 
-                out_script = action[f'{self.mode}_script']
-                if out_script:
-                    out_script = "    " + out_script.replace('\n', '\n    ')
-                    run_script = f"def build_script():    \n{out_script}\nresult = build_script()"
-                    try:
-                        local_vars = {}
-                        global_vars = {}
-                        exec(run_script, global_vars, local_vars)
-                        if type(local_vars.get("result")) == tuple:
-                            result, message = local_vars.get("result")
-                        else:
-                            result, message = local_vars.get("result"), None
-                    except Exception as e:
-                        print("---------------")
-                        print(f"Exec [{i + 1} {action['name']}] Error", str(e))
-                        for num, line in enumerate(run_script.split("\n")):
-                            print(line)
-                        print("---Traceback---")
-                        print(traceback.format_exc())
-                        print("---------------")
-                        result, message = False, e
+                result, message = run_script()
+                if result != True:
+                     fix_button()
+
             if action["type"] == "attr":
                 if config.soft_name() == "maya":
                     import maya.cmds as cmds
@@ -210,8 +192,19 @@ class ProgressThread(QtCore.QThread):
                                 print("---------------")
                                 print(f"Exec [{i}] Error:", str(e))
                                 result, message = False, e
+            if result == False:
+                self.result = False
+            if result == "warning" and self.result != False:
+                self.result = "warning"
             self.progress_updated.emit(int(100 / len(self.actions) * (i + 1)), str(result), message)
         self.progress_done.emit("")
+
+        if self.result == True:
+            for index in range(self.ui.post_buttons.count()):
+                post_button = self.ui.post_buttons.itemAt(index).widget()
+                result, message = post_button.click()
+                label_message = QtWidgets.QLabel(message)
+                self.ui.post_buttons.addWidget(label_message)
 
     def close(self):
         self.finished.emit()

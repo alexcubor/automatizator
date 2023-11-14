@@ -27,6 +27,8 @@ class WidgetAction(QtWidgets.QWidget):
         # Name action
         self.ui.title_action.setPlaceholderText(self.dict["title_placeholder"])
         self.ui.title_action.setStyleSheet("background-color: {0}; border: 0px solid {0}".format("#454545"))
+        #self.ui.title_action.setVerticalScrollBarPolicy(QtWidgets.Qt.ScrollBarAlwaysOff)
+        #self.ui.title_action.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         # Bar
         self.ui.button_collapse.setStyleSheet("QPushButton:hover { background-color: %s; }" % config.color_blue())
         self.ui.button_collapse.clicked.connect(self.collapse)

@@ -76,6 +76,7 @@ class Ui_widget_action(object):
         font.setPointSize(16)
         self.title_action.setFont(font)
         self.title_action.viewport().setProperty("cursor", QCursor(Qt.IBeamCursor))
+        self.title_action.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.layout_title.addWidget(self.title_action)
 
@@ -94,9 +95,7 @@ class Ui_widget_action(object):
         self.verticalLayout_2.setSizeConstraint(QLayout.SetDefaultConstraint)
         self.verticalLayout_2.setContentsMargins(12, 12, 12, 12)
         self.layout_rule = QHBoxLayout()
-#ifndef Q_OS_MAC
-        self.layout_rule.setSpacing(-1)
-#endif
+        self.layout_rule.setSpacing(6)
         self.layout_rule.setObjectName(u"layout_rule")
         self.layout_rule.setContentsMargins(-1, 0, 0, 0)
         self.run_label = QLabel(self.frame_action)
