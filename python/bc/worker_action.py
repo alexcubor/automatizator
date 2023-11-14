@@ -33,7 +33,7 @@ class WorkerAction(QtWidgets.QWidget):
             if text_size.height() == 0:
                 self.ui.info.setVisible(False)
             if text_size.height() < 100:
-                self.ui.info.setMaximumSize(1000, text_size.height() * 2)
+                self.ui.info.setMaximumSize(1000, text_size.height() + 13)
                 self.ui.info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         else:
             status_warning = QtGui.QPixmap(f"{self.parent.app_path}/icons/status_warning.png")
@@ -46,6 +46,6 @@ class WorkerAction(QtWidgets.QWidget):
                 if text_size.height() == 0:
                     self.ui.info.setVisible(False)
                 if text_size.height() < 100:
-                    self.ui.info.setMaximumSize(1000, text_size.height() * 2)
+                    self.ui.info.setMaximumSize(1000, text_size.height() + 13)
                     self.ui.info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.parent.ui.progress_bar.setValue(progress_value)
